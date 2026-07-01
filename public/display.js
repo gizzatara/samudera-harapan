@@ -188,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
           percent = Math.round((xhr.loaded / xhr.total) * 100);
         } else {
           // Fallback jika header Content-Length tidak ada
-          percent = Math.round(xhr.loaded / (29.3 * 1024 * 1024) * 100);
+          percent = Math.round(xhr.loaded / (37.2 * 1024 * 1024) * 100);
           percent = Math.min(99, percent);
         }
         const text = document.getElementById("model-loading-text");
