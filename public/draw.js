@@ -641,12 +641,31 @@ document.addEventListener("DOMContentLoaded", () => {
     const trimW = maxX - minX + 1;
     const trimH = maxY - minY + 1;
     
+    // Optimasi Ukuran: Batasi resolusi gambar maksimal 256px untuk menghemat ukuran database & mempercepat loading
+    const maxDimension = 256;
+    let targetW = trimW;
+    let targetH = trimH;
+    
+    if (trimW > maxDimension || trimH > maxDimension) {
+      if (trimW > trimH) {
+        targetW = maxDimension;
+        targetH = Math.round((trimH * maxDimension) / trimW);
+      } else {
+        targetH = maxDimension;
+        targetW = Math.round((trimW * maxDimension) / trimH);
+      }
+    }
+    
     const trimCanvas = document.createElement("canvas");
-    trimCanvas.width = trimW;
-    trimCanvas.height = trimH;
+    trimCanvas.width = targetW;
+    trimCanvas.height = targetH;
     const trimCtx = trimCanvas.getContext("2d");
     
-    trimCtx.drawImage(canvas, minX, minY, trimW, trimH, 0, 0, trimW, trimH);
+    // Aktifkan smoothing kualitas tinggi agar gambar tetap halus saat diperkecil
+    trimCtx.imageSmoothingEnabled = true;
+    trimCtx.imageSmoothingQuality = "high";
+    
+    trimCtx.drawImage(canvas, minX, minY, trimW, trimH, 0, 0, targetW, targetH);
     return trimCanvas.toDataURL("image/png");
   }
 
