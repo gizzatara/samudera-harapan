@@ -173,12 +173,31 @@ document.addEventListener("DOMContentLoaded", () => {
           });
           console.log(`Memainkan ${gltf.animations.length} klip animasi untuk default ikan.`);
         }
+
+        // Sembunyikan loading indicator
+        const loaderEl = document.getElementById("model-loading-indicator");
+        if (loaderEl) {
+          loaderEl.style.opacity = '0';
+          loaderEl.style.transform = 'translateY(-10px)';
+          setTimeout(() => loaderEl.remove(), 500);
+        }
       },
       (xhr) => {
-        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        let percent = 0;
+        if (xhr.total > 0) {
+          percent = Math.round((xhr.loaded / xhr.total) * 100);
+        } else {
+          // Fallback jika header Content-Length tidak ada
+          percent = Math.round(xhr.loaded / (29.3 * 1024 * 1024) * 100);
+          percent = Math.min(99, percent);
+        }
+        const text = document.getElementById("model-loading-text");
+        if (text) text.textContent = `Memuat ikan hiasan... (${percent}%)`;
       },
       (error) => {
         console.error("Gagal memuat default school of fish GLB:", error);
+        const loaderEl = document.getElementById("model-loading-indicator");
+        if (loaderEl) loaderEl.remove();
       }
     );
   }
