@@ -16,6 +16,11 @@ const SETTINGS_FILE = path.join(__dirname, 'settings.json');
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Explicitly serve index.html for root path to prevent "Not Found" on Render
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // ─── Helpers ───
 function broadcast(msg) {
   const data = JSON.stringify(msg);
