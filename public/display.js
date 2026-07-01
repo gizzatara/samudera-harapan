@@ -129,8 +129,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Bubble Particles
     createBubbles();
 
-    // Load default school of fish GLB
-    loadDefaultSchoolOfFish();
+    // Load default school of fish GLB (Disabled for speed/bandwidth optimization)
+    // loadDefaultSchoolOfFish();
 
     // Listeners
     window.addEventListener("resize", onWindowResize);
