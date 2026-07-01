@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Daftar Ikan Harapan | Samudera Harapan</title>
+  <!-- JSZip untuk download banyak sekaligus sbg ZIP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #070f1a; color: #c8e6f7; min-height: 100vh; padding: 24px 20px 60px; }
+
+    header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid rgba(0,200,255,0.15); }
+    header h1 { font-size: 1.4rem; font-weight: 700; color: #5ce1e6; }
+    #header-time { font-size: 0.82rem; color: #4a90b8; }
+
+    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; align-items: center; }
+    .toolbar input[type=text] { flex: 1; min-width: 200px; padding: 9px 14px; border-radius: 8px; border: 1px solid rgba(0,200,255,0.2); background: rgba(255,255,255,0.04); color: #c8e6f7; font-size: 0.9rem; outline: none; }
+    .toolbar input[type=text]:focus { border-color: rgba(0,200,255,0.5); }
+    .toolbar input::placeholder { color: #4a6a80; }
+
+    .btn { padding: 9px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: opacity 0.2s, transform 0.1s; white-space: nowrap; }
+    .btn:hover { opacity: 0.85; } .btn:active { transform: scale(0.97); }
+    .btn-primary { background: #0891b2; color: #fff; }
+    .btn-success { background: #059669; color: #fff; }
+    .btn-danger  { background: rgba(239,68,68,0.85); color: #fff; }
+        .btn-warning { background: rgba(234,179,8,0.85); color: #0b1d33; }
+    .btn-outline { background: transparent; border: 1px solid rgba(0,200,255,0.3); color: #5ce1e6; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Selection Bar */
+    #selection-bar { display: none; align-items: center; gap: 12px; flex-wrap: wrap; background: rgba(8,145,178,0.12); border: 1px solid rgba(0,200,255,0.2); border-radius: 10px; padding: 10px 16px; margin-bottom: 14px; }
+    #selection-bar.active { display: flex; }
+    #sel-count { font-weight: 600; color: #5ce1e6; font-size: 0.9rem; }
+    #selection-bar .spacer { flex: 1; }
+
+    /* Progress Bar */
+    #progress-wrap { display: none; margin-bottom: 14px; }
+    #progress-wrap.active { display: block; }
+    #progress-bar-bg { background: rgba(255,255,255,0.07); border-radius: 8px; height: 10px; overflow: hidden; }
+    #progress-bar-fill { background: linear-gradient(90deg, #0891b2, #5ce1e6); height: 100%; width: 0%; transition: width 0.2s; border-radius: 8px; }
+    #progress-label { font-size: 0.78rem; color: #4a90b8; margin-top: 5px; }
+
+    #stats { font-size: 0.82rem; color: #4a90b8; margin-bottom: 16px; }
+
+    /* Select-all checkbox row */
+    #select-all-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 0.85rem; color: #7ab8d4; cursor: pointer; user-select: none; }
+    #select-all-row input { width: 16px; height: 16px; cursor: pointer; accent-color: #0891b2; }
+
+    #gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+
+    .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(0,200,255,0.12); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: border-color 0.2s, box-shadow 0.2s; position: relative; }
+    .card.selected { border-color: #0891b2; box-shadow: 0 0 18px rgba(8,145,178,0.3); }
+    .card:hover { border-color: rgba(0,200,255,0.35); }
+
+    .card-checkbox { position: absolute; top: 10px; left: 10px; z-index: 5; }
+    .card-checkbox input { width: 18px; height: 18px; cursor: pointer; accent-color: #0891b2; }
+
+    .card-img { background: repeating-conic-gradient(#0f2035 0% 25%, #0a1828 0% 50%) 0 0 / 20px 20px; display: flex; align-items: center; justify-content: center; min-height: 150px; padding: 12px; cursor: pointer; }
+    .card-img img { max-width: 100%; max-height: 140px; object-fit: contain; border-radius: 4px; }
+
+    .card-body { padding: 11px 13px; flex: 1; display: flex; flex-direction: column; gap: 5px; }
+    .card-name { font-weight: 700; font-size: 0.95rem; color: #e0f4ff; }
+    .card-wish { font-size: 0.8rem; color: #7ab8d4; line-height: 1.45; flex: 1; }
+    .card-meta { font-size: 0.7rem; color: #3a6a80; }
+
+    .card-actions { padding: 8px 12px 12px; display: flex; gap: 7px; }
+    .card-actions .btn { flex: 1; padding: 6px 8px; font-size: 0.76rem; }
+    
+        .card.hidden-fish { opacity: 0.55; border-color: rgba(239,68,68,0.25); }
+        .card.hidden-fish:hover { opacity: 0.75; }
+        .hidden-badge { position: absolute; top: 8px; right: 8px; z-index: 5; background: rgba(239,68,68,0.85); color: #fff; font-size: 0.68rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px; }
+
+    #loading, #empty { text-align: center; padding: 60px 20px; color: #3a6a80; font-size: 0.95rem; }
+    #empty { display: none; }
+
+    /* Settings panel styling */
+    .settings-panel {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(0,200,255,0.1);
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+    .settings-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #5ce1e6;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .settings-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: #c8e6f7;
+      cursor: pointer;
+      user-select: none;
+    }
+    .settings-item input {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: #0891b2;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🐠 Admin — Daftar Ikan Harapan</h1>
+    <span id="header-time"></span>
+  </header>
+
+  <div class="toolbar">
+    <input type="text" id="search-input" placeholder="🔍 Cari nama atau doa...">
+    <button class="btn btn-outline" onclick="loadFishes()">🔄 Refresh</button>
+    <button class="btn btn-success" id="btn-dl-all" onclick="downloadAllPng()">⬇️ Download Semua ZIP</button>
+    <button class="btn btn-danger" onclick="clearAll()">🧹 Bersihkan Akuarium</button>
+    <button class="btn btn-warning" id="btn-hide-all" onclick="hideAllFishes()">🙈 Sembunyikan Semua</button>
+  </div>
+
+  <!-- Panel Pengaturan Display -->
+  <div class="settings-panel">
+    <div class="settings-title">⚙️ Pengaturan Tampilan Display (Akuarium 3D)</div>
+    <div class="settings-grid">
+      <label class="settings-item">
+        <input type="checkbox" id="set-hide-draw" onchange="saveSettings()">
+        <span>Sembunyikan tombol "Menggambar Ikan"</span>
+      </label>
+      <label class="settings-item">
+        <input type="checkbox" id="set-hide-bubbles" onchange="saveSettings()">
+        <span>Sembunyikan tombol "Sembunyikan Doa"</span>
+      </label>
+      <label class="settings-item">
+        <input type="checkbox" id="set-hide-fullscreen" onchange="saveSettings()">
+        <span>Sembunyikan tombol "Layar Penuh"</span>
+      </label>
+      <label class="settings-item">
+        <input type="checkbox" id="set-hide-toggle" onchange="saveSettings()">
+        <span>Sembunyikan tombol "Toggle Toolbar (👁️‍🗨️)"</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Selection Bar (muncul saat ada yang dicentang) -->
+  <div id="selection-bar">
+    <span id="sel-count">0 dipilih</span>
+    <button class="btn btn-success" id="btn-dl-selected" onclick="downloadSelectedZip()">⬇️ Download Terpilih (ZIP)</button>
+    <button class="btn btn-danger" id="btn-del-selected" onclick="deleteSelected()">🗑️ Hapus Terpilih</button>
+    <span class="spacer"></span>
+    <button class="btn btn-outline" onclick="clearSelection()">✕ Batal Pilih</button>
+  </div>
+
+  <!-- Progress Bar -->
+  <div id="progress-wrap">
+    <div id="progress-bar-bg"><div id="progress-bar-fill"></div></div>
+    <div id="progress-label">Memproses...</div>
+  </div>
+
+  <div id="stats">Memuat data...</div>
+  <label id="select-all-row">
+    <input type="checkbox" id="chk-select-all" onchange="toggleSelectAll()">
+    <span>Pilih semua yang ditampilkan</span>
+  </label>
+
+  <div id="loading">⏳ Memuat daftar ikan...</div>
+  <div id="empty">📭 Belum ada ikan harapan yang dikirim.</div>
+  <div id="gallery"></div>
+
+  <script>
+    let allFishes = [];
+    let selectedIds = new Set();
+
+    function formatDate(iso) {
+      try { return new Date(iso).toLocaleString('id-ID', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }); }
+      catch { return iso; }
+    }
+
+    function updateTime() { document.getElementById('header-time').textContent = new Date().toLocaleString('id-ID'); }
+    updateTime(); setInterval(updateTime, 1000);
+
+    function escHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function getCurrentFiltered() {
+      const q = document.getElementById('search-input').value.toLowerCase().trim();
+      return q ? allFishes.filter(f => f.name.toLowerCase().includes(q) || f.wish.toLowerCase().includes(q)) : [...allFishes];
+    }
+
+    function updateSelectionBar() {
+      const bar = document.getElementById('selection-bar');
+      document.getElementById('sel-count').textContent = `${selectedIds.size} dipilih`;
+      if (selectedIds.size > 0) bar.classList.add('active'); else bar.classList.remove('active');
+    }
+
+    function toggleCard(id) {
+      if (selectedIds.has(id)) { selectedIds.delete(id); } else { selectedIds.add(id); }
+      const card = document.getElementById('card-' + id);
+      if (card) {
+        card.classList.toggle('selected', selectedIds.has(id));
+        card.querySelector('.card-checkbox input').checked = selectedIds.has(id);
+      }
+      updateSelectionBar();
+      syncSelectAllCheckbox();
+    }
+
+    function clearSelection() {
+      selectedIds.clear();
+      document.querySelectorAll('.card').forEach(c => { c.classList.remove('selected'); c.querySelector('.card-checkbox input').checked = false; });
+      updateSelectionBar();
+      document.getElementById('chk-select-all').checked = false;
+    }
+
+    function toggleSelectAll() {
+      const filtered = getCurrentFiltered();
+      const allSelected = filtered.every(f => selectedIds.has(f.id));
+      if (allSelected) {
+        filtered.forEach(f => { selectedIds.delete(f.id); const c = document.getElementById('card-'+f.id); if(c){c.classList.remove('selected');c.querySelector('.card-checkbox input').checked=false;} });
+      } else {
+        filtered.forEach(f => { selectedIds.add(f.id); const c = document.getElementById('card-'+f.id); if(c){c.classList.add('selected');c.querySelector('.card-checkbox input').checked=true;} });
+      }
+      updateSelectionBar();
+      syncSelectAllCheckbox();
+    }
+
+    function syncSelectAllCheckbox() {
+      const filtered = getCurrentFiltered();
+      document.getElementById('chk-select-all').checked = filtered.length > 0 && filtered.every(f => selectedIds.has(f.id));
+    }
+
+    // Base64 data URL → Uint8Array blob untuk JSZip
+    function dataUrlToUint8(dataUrl) {
+      const base64 = dataUrl.split(',')[1];
+      const bin = atob(base64);
+      const arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      return arr;
+    }
+
+    function safeName(fish) {
+      return fish.name.replace(/[^a-z0-9]/gi, '_').substring(0, 25) + '_' + fish.id.slice(-6);
+    }
+
+    function setProgress(pct, label) {
+      const wrap = document.getElementById('progress-wrap');
+      wrap.classList.add('active');
+      document.getElementById('progress-bar-fill').style.width = pct + '%';
+      document.getElementById('progress-label').textContent = label;
+      if (pct >= 100) setTimeout(() => wrap.classList.remove('active'), 1500);
+    }
+
+    async function buildZip(fishes) {
+      const zip = new JSZip();
+      const folder = zip.folder('ikan_harapan');
+      for (let i = 0; i < fishes.length; i++) {
+        const f = fishes[i];
+        setProgress(Math.round((i / fishes.length) * 80), `Memproses ${i+1}/${fishes.length}: ${f.name}`);
+        const compositeUrl = await createCompositeImage(f);
+        folder.file(safeName(f) + '.png', dataUrlToUint8(compositeUrl));
+        await new Promise(r => setTimeout(r, 5));
+      }
+      setProgress(90, 'Membuat file ZIP...');
+      const blob = await zip.generateAsync({ type: 'blob' }, meta => {
+        setProgress(90 + Math.round(meta.percent * 0.1), 'Mengompresi ZIP...');
+      });
+      setProgress(100, '✅ Selesai!');
+      return blob;
+    }
+
+    async function downloadZipBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 3000);
+    }
+
+    async function downloadAllPng() {
+      const list = getCurrentFiltered();
+      if (!list.length) { alert('Tidak ada ikan untuk diunduh.'); return; }
+      if (!confirm(`Download ${list.length} ikan sebagai ZIP?`)) return;
+      const blob = await buildZip(list);
+      downloadZipBlob(blob, `ikan_harapan_semua_${Date.now()}.zip`);
+    }
+
+    async function downloadSelectedZip() {
+      const list = allFishes.filter(f => selectedIds.has(f.id));
+      if (!list.length) { alert('Tidak ada ikan yang dipilih.'); return; }
+      const blob = await buildZip(list);
+      downloadZipBlob(blob, `ikan_harapan_pilihan_${Date.now()}.zip`);
+    }
+
+    // Buat gambar komposit: ikan + nama + doa sebagai satu PNG
+    function createCompositeImage(fish) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = fish.image;
+        img.onload = () => {
+          const padX = 40;
+          const padTop = 30;
+          const padBottom = 80; // Ruang untuk teks
+          const imgW = Math.min(img.naturalWidth, 400);
+          const imgH = (img.naturalHeight / img.naturalWidth) * imgW;
+          const totalW = imgW + padX * 2;
+          const totalH = imgH + padTop + padBottom;
+
+          const canvas = document.createElement('canvas');
+          canvas.width = totalW;
+          canvas.height = totalH;
+          const ctx = canvas.getContext('2d');
+
+          // Background gelap
+          ctx.fillStyle = '#0b1d33';
+          ctx.fillRect(0, 0, totalW, totalH);
+
+          // Border
+          ctx.strokeStyle = 'rgba(0,200,255,0.3)';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(1, 1, totalW - 2, totalH - 2);
+
+          // Gambar ikan
+          ctx.drawImage(img, padX, padTop, imgW, imgH);
+
+          // Teks nama
+          ctx.fillStyle = '#5ce1e6';
+          ctx.font = 'bold 16px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('🐠 ' + fish.name, totalW / 2, padTop + imgH + 24);
+
+          // Teks doa (wrap jika panjang)
+          ctx.fillStyle = '#c8e6f7';
+          ctx.font = 'italic 13px Inter, sans-serif';
+          const wish = '"' + fish.wish + '"';
+          const maxW = totalW - 40;
+          const words = wish.split(' ');
+          let line = '';
+          let y = padTop + imgH + 48;
+          for (const word of words) {
+            const testLine = line + word + ' ';
+            if (ctx.measureText(testLine).width > maxW && line) {
+              ctx.fillText(line.trim(), totalW / 2, y);
+              line = word + ' ';
+              y += 18;
+            } else {
+              line = testLine;
+            }
+          }
+          ctx.fillText(line.trim(), totalW / 2, y);
+
+          resolve(canvas.toDataURL('image/png'));
+        };
+        img.onerror = () => resolve(fish.image); // Fallback ke gambar asli
+      });
+    }
+
+    async function downloadOne(fishId) {
+      const fish = allFishes.find(f => f.id === fishId);
+      if (!fish) return;
+      const compositeUrl = await createCompositeImage(fish);
+      const a = document.createElement('a');
+      a.href = compositeUrl;
+      a.download = safeName(fish) + '.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    async function deleteFish(fishId) {
+      if (!confirm('Hapus permanen ikan ini dari database?')) return;
+      const res = await fetch(`/api/fish/${fishId}`, { method: 'DELETE' }).catch(() => null);
+      if (res && res.ok) {
+        allFishes = allFishes.filter(f => f.id !== fishId);
+        selectedIds.delete(fishId);
+        renderGallery(getCurrentFiltered());
+        updateSelectionBar();
+      } else {
+        alert('Gagal menghapus. Pastikan server mendukung DELETE /api/fish/:id');
+      }
+    }
+
+    async function toggleHiddenFish(fishId) {
+      const fish = allFishes.find(f => f.id === fishId);
+      if (!fish) return;
+      const res = await fetch(`/api/fish/${fishId}/toggle-hidden`, { method: 'POST' }).catch(() => null);
+      if (res && res.ok) {
+        const result = await res.json();
+        fish.hidden = result.hidden;
+        renderGallery(getCurrentFiltered());
+      } else {
+        alert('Gagal mengubah status ikan.');
+      }
+    }
+
+    async function hideAllFishes() {
+      const vis = allFishes.filter(f => !f.hidden);
+      if (vis.length === 0) { alert('Semua ikan sudah disembunyikan.'); return; }
+      if (!confirm(`Sembunyikan ${vis.length} ikan? Ikan tidak akan tampil di display.`)) return;
+      const res = await fetch('/api/fishes/hide-all', { method: 'POST' }).catch(() => null);
+      if (res && res.ok) {
+        const result = await res.json();
+        allFishes.forEach(f => f.hidden = true);
+        alert(`${result.hidden_count} ikan disembunyikan dari display.`);
+        renderGallery(getCurrentFiltered());
+      } else {
+        alert('Gagal menyembunyikan ikan.');
+      }
+    }
+
+    async function deleteSelected() {
+      if (!selectedIds.size) return;
+      if (!confirm(`Hapus ${selectedIds.size} ikan yang dipilih? Tindakan ini tidak bisa dibatalkan!`)) return;
+      const ids = [...selectedIds];
+      for (const id of ids) {
+        const res = await fetch(`/api/fish/${id}`, { method: 'DELETE' }).catch(() => null);
+        if (res && res.ok) { allFishes = allFishes.filter(f => f.id !== id); selectedIds.delete(id); }
+      }
+      renderGallery(getCurrentFiltered());
+      updateSelectionBar();
+    }
+
+    function renderGallery(fishes) {
+      const gallery = document.getElementById('gallery');
+      const empty = document.getElementById('empty');
+      const hiddenCount = allFishes.filter(f => f.hidden).length;
+      document.getElementById('stats').textContent = `Total: ${allFishes.length} ikan • Ditampilkan: ${fishes.length} ikan${hiddenCount > 0 ? ` • 🔒 Tersembunyi: ${hiddenCount}` : ''}`;
+
+      if (!fishes.length) { gallery.innerHTML = ''; empty.style.display = 'block'; syncSelectAllCheckbox(); return; }
+      empty.style.display = 'none';
+
+      const sorted = [...fishes].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      gallery.innerHTML = sorted.map(fish => `
+        <div class="card ${selectedIds.has(fish.id) ? 'selected' : ''} ${fish.hidden ? 'hidden-fish' : ''}" id="card-${fish.id}">
+          ${fish.hidden ? '<div class="hidden-badge">🔒 TERSEMBUNYI</div>' : ''}
+          <div class="card-checkbox"><input type="checkbox" ${selectedIds.has(fish.id) ? 'checked' : ''} onchange="toggleCard('${fish.id}')"></div>
+          <div class="card-img" onclick="toggleCard('${fish.id}')">
+            <img src="${fish.image}" alt="Ikan ${escHtml(fish.name)}" loading="lazy">
+          </div>
+          <div class="card-body">
+            <div class="card-name">🐠 ${escHtml(fish.name)}</div>
+            <div class="card-wish">"${escHtml(fish.wish)}"</div>
+            <div class="card-meta">🕐 ${formatDate(fish.created_at)}</div>
+          </div>
+          <div class="card-actions">
+            <button class="btn btn-primary" onclick="downloadOne('${fish.id}')">⬇️ PNG</button>
+            <button class="btn ${fish.hidden ? 'btn-success' : 'btn-outline'}" onclick="toggleHiddenFish('${fish.id}')">${fish.hidden ? '🔓 Tampilkan' : '👁️ Sembunyikan'}</button>
+            <button class="btn btn-danger" onclick="deleteFish('${fish.id}')">🗑️</button>
+          </div>
+        </div>`).join('');
+      syncSelectAllCheckbox();
+    }
+
+    async function loadFishes() {
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('gallery').innerHTML = '';
+      document.getElementById('empty').style.display = 'none';
+      try {
+        const res = await fetch('/api/fishes');
+        allFishes = await res.json();
+        document.getElementById('loading').style.display = 'none';
+        renderGallery(getCurrentFiltered());
+      } catch {
+        document.getElementById('loading').textContent = '❌ Gagal memuat data dari server.';
+      }
+    }
+
+    document.getElementById('search-input').addEventListener('input', () => { renderGallery(getCurrentFiltered()); syncSelectAllCheckbox(); });
+
+    // Bersihkan seluruh akuarium — hapus semua ikan dari database
+    async function clearAll() {
+      if (allFishes.length === 0) { alert('Akuarium sudah kosong.'); return; }
+      if (!confirm(`⚠️ Hapus SEMUA ${allFishes.length} ikan dari akuarium?\nTindakan ini tidak bisa dibatalkan!`)) return;
+
+      const res = await fetch('/api/fishes/all', { method: 'DELETE' }).catch(() => null);
+      if (res && res.ok) {
+        const result = await res.json();
+        allFishes = [];
+        selectedIds.clear();
+        renderGallery([]);
+        updateSelectionBar();
+        document.getElementById('stats').textContent = `✅ Akuarium berhasil dibersihkan (${result.removed} ikan dihapus).`;
+      } else {
+        alert('❌ Gagal membersihkan akuarium. Pastikan server berjalan.');
+      }
+    }
+
+    async function loadSettings() {
+      try {
+        const res = await fetch('/api/settings');
+        const settings = await res.json();
+        document.getElementById('set-hide-draw').checked = settings.hideDrawBtn;
+        document.getElementById('set-hide-bubbles').checked = settings.hideToggleBubblesBtn;
+        document.getElementById('set-hide-fullscreen').checked = settings.hideFullscreenBtn;
+        document.getElementById('set-hide-toggle').checked = settings.hideToolbarToggleBtn;
+      } catch (err) {
+        console.error("Gagal memuat pengaturan:", err);
+      }
+    }
+
+    async function saveSettings() {
+      const settings = {
+        hideDrawBtn: document.getElementById('set-hide-draw').checked,
+        hideToggleBubblesBtn: document.getElementById('set-hide-bubbles').checked,
+        hideFullscreenBtn: document.getElementById('set-hide-fullscreen').checked,
+        hideToolbarToggleBtn: document.getElementById('set-hide-toggle').checked
+      };
+
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(settings)
+        });
+        if (!res.ok) alert("Gagal menyimpan pengaturan.");
+      } catch (err) {
+        console.error("Gagal menyimpan pengaturan:", err);
+        alert("Gagal terhubung ke server.");
+      }
+    }
+
+    loadSettings();
+    loadFishes();
+  </script>
+</body>
+</html>

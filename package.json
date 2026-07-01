@@ -1,0 +1,18 @@
+{
+  "name": "samudera-harapan",
+  "version": "1.0.0",
+  "description": "3D Ocean Wish Aquarium — kirim harapan untuk alam",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "mongodb": "^6.5.0",
+    "ws": "^8.17.0"
+  }
+}

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Samudera Harapan — Akuarium 3D</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Load Three.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Load GLTFLoader to load animated 3D fish models -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <style>
+    /* ─── Panel Menggambar Overlay (muncul di atas akuarium) ─── */
+    #draw-panel-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(2, 15, 30, 0.82);
+      backdrop-filter: blur(6px);
+      align-items: center;
+      justify-content: center;
+    }
+    #draw-panel-overlay.active {
+      display: flex;
+    }
+    #draw-panel-inner {
+      position: relative;
+      width: 98vw;
+      max-width: 1200px;
+      height: 94vh;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 0 60px rgba(0, 180, 255, 0.35);
+      border: 1px solid rgba(0, 200, 255, 0.25);
+    }
+    #draw-panel-inner iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    #close-draw-panel {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      z-index: 510;
+      background: rgba(239, 68, 68, 0.85);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+      transition: background 0.2s;
+    }
+    #close-draw-panel:hover { background: rgba(220, 38, 38, 1); }
+  </style>
+</head>
+<body style="background-color: #030d16;">
+
+  <!-- Container Utama WebGL (Three.js) -->
+  <div id="aquarium-container"></div>
+
+  <!-- Layer HTML untuk Balon Doa Pengunjung -->
+  <div id="bubbles-layer"></div>
+
+  <!-- Overlay Pengumuman Ikan Baru Bergabung -->
+  <div id="new-fish-overlay">
+    <div class="announcement-card">
+      <h4>🐠 IKAN HARAPAN BARU</h4>
+      <h3 id="announcement-name">NAMA PENGUNJUNG</h3>
+      
+      <div class="announcement-fish-preview">
+        <img id="announcement-img" src="" alt="Pratinjau Ikan">
+      </div>
+      
+      <p class="announcement-wish" id="announcement-wish">Doa atau harapan yang ditulis oleh pengunjung akan muncul di sini secara real-time.</p>
+    </div>
+  </div>
+
+  <!-- Panel Menggambar Overlay (muncul di atas akuarium) -->
+  <div id="draw-panel-overlay">
+    <div id="draw-panel-inner">
+      <!-- Tombol Tutup Panel -->
+      <button id="close-draw-panel" title="Tutup">✕</button>
+      <!-- Halaman Menggambar dimuat di dalam iframe -->
+      <iframe id="draw-iframe" src="" title="Menggambar Ikan Harapan"></iframe>
+    </div>
+  </div>
+
+  <!-- Floating Toolbar Controls -->
+  <div class="display-controls">
+    <button id="btn-draw" class="ui-btn">✏️ Menggambar Ikan</button>
+    <button id="btn-toggle-bubbles" class="ui-btn">👁️ Sembunyikan Doa</button>
+    <button id="btn-fullscreen" class="ui-btn">🖥️ Layar Penuh</button>
+  </div>
+
+  <!-- Tombol Toggle Toolbar (selalu terlihat) -->
+  <button id="btn-toggle-toolbar" class="ui-btn ui-btn-toggle" title="Sembunyikan/Tampilkan Toolbar">👁️‍🗨️</button>
+
+  <!-- Tombol Reset Zoom (muncul hanya saat di-zoom) -->
+  <button id="btn-reset-zoom" class="reset-zoom-btn" style="display:none;" title="Reset Zoom (R)">🔄 Reset View</button>
+
+  <script>
+    // === Panel Menggambar Overlay ===
+    const drawPanel = document.getElementById('draw-panel-overlay');
+    const drawIframe = document.getElementById('draw-iframe');
+    const btnDraw = document.getElementById('btn-draw');
+    const closeBtn = document.getElementById('close-draw-panel');
+
+    btnDraw.addEventListener('click', () => {
+      // Muat halaman menggambar ke dalam iframe saat pertama kali dibuka
+      if (!drawIframe.src || drawIframe.src === window.location.href) {
+        drawIframe.src = '/';
+      }
+      drawPanel.classList.add('active');
+    });
+
+    closeBtn.addEventListener('click', () => {
+      drawPanel.classList.remove('active');
+    });
+
+    // Tutup panel jika klik area luar panel
+    drawPanel.addEventListener('click', (e) => {
+      if (e.target === drawPanel) drawPanel.classList.remove('active');
+    });
+  </script>
+
+  <script src="display.js"></script>
+
+  <div class="credit-footer">
+    dibuat oleh <a href="https://www.instagram.com/gizzatara/" target="_blank" rel="noopener">Gizzatara</a>
+    · ikan: <a href="https://sketchfab.com/pcarnage252" target="_blank" rel="noopener">School Of Fish by Titanas YT</a>
+    · <a href="https://gizzatara.web.app/" target="_blank" rel="noopener">gizzatara.web.app</a>
+  </div>
+</body>
+</html>
+

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id" class="draw-page">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Kirim Harapan — Samudera Harapan</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="draw-page">
+
+  <!-- Deteksi iframe: sesuaikan layout agar panel kanan tidak kepotong -->
+  <script>
+    if (window.self !== window.top) {
+      document.documentElement.style.height = '100%';
+      document.body.style.height = '100%';
+      document.body.style.overflowY = 'auto';
+      document.body.style.overflowX = 'hidden';
+      
+      const style = document.createElement('style');
+      style.textContent = `
+        .app-container {
+          height: auto !important;
+          min-height: 100% !important;
+        }
+        .left-panel { min-width: 400px; }
+        .right-panel { flex-shrink: 0; }
+        .credit-footer { display: none !important; }
+      `;
+      document.head.appendChild(style);
+    }
+  </script>
+
+  <!-- Aplikasi Utama -->
+  <div class="app-container">
+    
+    <!-- Kanvas Lukis -->
+    <div class="left-panel">
+      <header>
+        <h1>SAMUDERA HARAPAN</h1>
+        <div class="subtitle">Gambar ikanmu, tulis doamu, lepas ke laut lepas · <a href="/display.html" style="color:#5ce1e6;text-decoration:none;font-weight:600;">🎏 Lihat Akuarium</a></div>
+      </header>
+      
+      <div class="canvas-wrapper" id="canvas-container">
+        <canvas id="draw-canvas"></canvas>
+      </div>
+      
+      <!-- Kontrol Kanvas -->
+      <div class="drawing-controls">
+        <div class="tools-group">
+          <button id="tool-brush" class="tool-btn active" title="Kuas Lukis">
+            <span>✏️</span> Kuas
+          </button>
+          <button id="tool-bucket" class="tool-btn" title="Ember Cat">
+            <span>🪣</span> Ember Cat
+          </button>
+          <button id="tool-eraser" class="tool-btn" title="Penghapus">
+            <span>🧼</span> Hapus
+          </button>
+          <button id="btn-clear" class="tool-btn" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4);" title="Bersihkan Kanvas">
+            <span>🗑️</span> Bersih
+          </button>
+        </div>
+
+        <div class="brush-size-container" id="brush-size-section">
+          <span>Ukuran:</span>
+          <input type="range" id="brush-size" min="4" max="40" value="12">
+        </div>
+
+        <button id="btn-canvas-reset-zoom" class="tool-btn" style="display:none;" title="Reset Zoom">🔄 1:1</button>
+
+        <!-- Palet Warna -->
+        <div class="color-palette">
+          <div class="color-swatch active" style="background-color: #050505;" data-color="#050505"></div>
+          <div class="color-swatch" style="background-color: #ffffff; border: 2px solid #555;" data-color="#ffffff"></div>
+          <div class="color-swatch" style="background-color: #ef4444;" data-color="#ef4444"></div>
+          <div class="color-swatch" style="background-color: #f97316;" data-color="#f97316"></div>
+          <div class="color-swatch" style="background-color: #eab308;" data-color="#eab308"></div>
+          <div class="color-swatch" style="background-color: #22c55e;" data-color="#22c55e"></div>
+          <div class="color-swatch" style="background-color: #06b6d4;" data-color="#06b6d4"></div>
+          <div class="color-swatch" style="background-color: #3b82f6;" data-color="#3b82f6"></div>
+          <div class="color-swatch" style="background-color: #a855f7;" data-color="#a855f7"></div>
+        </div>
+
+        <!-- Color Picker untuk warna kustom -->
+        <div class="custom-color-picker">
+          <label for="color-picker-input" class="picker-label">🎨 Kustom:</label>
+          <input type="color" id="color-picker-input" value="#050505">
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulir Doa & Harapan -->
+    <div class="right-panel">
+      <div class="form-section">
+        <div class="input-group">
+          <label for="input-name">NAMA ANDA</label>
+          <input type="text" id="input-name" placeholder="Masukkan nama panggilan..." maxlength="25" autocomplete="off">
+        </div>
+        
+        <div class="input-group" style="flex: 1; display: flex; flex-direction: column;">
+          <label for="input-wish">DOA &amp; HARAPAN UNTUK ALAM</label>
+          <textarea id="input-wish" placeholder="Tuliskan harapan atau doamu di sini..." maxlength="150" style="flex: 1;"></textarea>
+        </div>
+      </div>
+
+      <button id="btn-submit" class="btn-submit" disabled>
+        <span>🐠</span> Lepaskan Ikanmu!
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Dialog Box Konfirmasi Garis Tipis -->
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal-card">
+      <h3>🐠 Ikanmu Hanya Berupa Garis?</h3>
+      <p>Ikanmu tampak seperti coretan garis tanpa warna isi. Kamu bisa kembali mewarnainya menggunakan alat <strong>Ember Cat</strong> agar terlihat lebih tebal dan solid di akuarium 3D, atau tetap mengirimkannya seperti ini.</p>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-fix" id="modal-btn-fix">🎨 Perbaiki</button>
+        <button class="modal-btn modal-btn-send" id="modal-btn-send">Kirim Saja ➡️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifikasi Sukses -->
+  <div id="toast">Ikan Harapanmu berhasil dilepas ke laut! 🌊</div>
+
+  <script src="draw.js"></script>
+
+  <div class="credit-footer">
+    dibuat oleh <a href="https://www.instagram.com/gizzatara/" target="_blank" rel="noopener">Gizzatara</a>
+    · ikan: <a href="https://sketchfab.com/pcarnage252" target="_blank" rel="noopener">School Of Fish by Titanas YT</a>
+    · <a href="https://gizzatara.web.app/" target="_blank" rel="noopener">gizzatara.web.app</a>
+  </div>
+</body>
+</html>
