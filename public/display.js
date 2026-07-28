@@ -16,12 +16,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const uniformTime = { value: 0 };
   const clock = new THREE.Clock();
 
-  // Batas ruang akuarium 3D (XYZ)
+  // Batas ruang akuarium 3D (XYZ) - Terpusat di tengah agar ikan bergerombol
   const BOUNDS = {
-    xMin: -60, xMax: 60,
-    yMin: -35, yMax: 35,
-    zMin: -50, zMax: 10
+    xMin: -35, xMax: 35,
+    yMin: -20, yMax: 20,
+    zMin: -35, zMax: 5
   };
+
+  // Group Target (Titik pusat kelompok gerombolan ikan)
+  const groupTarget = new THREE.Vector3(0, 0, -15);
+  let groupTargetTimer = 0;
+
+  function updateGroupTarget(dt) {
+    groupTargetTimer -= dt;
+    if (groupTargetTimer <= 0) {
+      // Pindahkan titik gerombol utama secara acak di area tengah layar
+      groupTarget.set(
+        (Math.random() - 0.5) * 40, // Area X tengah
+        (Math.random() - 0.5) * 24, // Area Y tengah
+        -20 + (Math.random() - 0.5) * 20 // Area Z tengah
+      );
+      groupTargetTimer = 5 + Math.random() * 7; // Ganti titik gerombol setiap 5-12 detik
+    }
+  }
 
   // SOUND SYNTHESIZER (Web Audio API)
   function playSplashSound() {
@@ -723,16 +740,24 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function chooseNewTarget(fish) {
+    // Setiap ikan membuat target di sekitar titik gerombolan utama (groupTarget)
+    const offsetX = (Math.random() - 0.5) * 24;
+    const offsetY = (Math.random() - 0.5) * 16;
+    const offsetZ = (Math.random() - 0.5) * 18;
+
     fish.target.set(
-      Math.random() * (BOUNDS.xMax - BOUNDS.xMin) + BOUNDS.xMin,
-      Math.random() * (BOUNDS.yMax - BOUNDS.yMin) + BOUNDS.yMin,
-      Math.random() * (BOUNDS.zMax - BOUNDS.zMin) + BOUNDS.zMin
+      Math.max(BOUNDS.xMin, Math.min(BOUNDS.xMax, groupTarget.x + offsetX)),
+      Math.max(BOUNDS.yMin, Math.min(BOUNDS.yMax, groupTarget.y + offsetY)),
+      Math.max(BOUNDS.zMin, Math.min(BOUNDS.zMax, groupTarget.z + offsetZ))
     );
-    fish.changeTargetTimer = 8 + Math.random() * 12; // Ganti target setiap 8-20 detik
+    fish.changeTargetTimer = 4 + Math.random() * 6; // Ganti target setiap 4-10 detik
   }
 
   function updateFishes(dt) {
-    fishes.forEach(fish => {
+    // Update titik pusat kelompok gerombolan
+    updateGroupTarget(dt);
+
+    fishes.forEach((fish, index) => {
       if (!fish.mesh) return;
 
       fish.changeTargetTimer -= dt;
@@ -755,18 +780,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Hitung jarak ke target
       const distToTarget = fish.mesh.position.distanceTo(fish.target);
-      if (distToTarget < 10 || fish.changeTargetTimer <= 0) {
+      if (distToTarget < 8 || fish.changeTargetTimer <= 0) {
         chooseNewTarget(fish);
       }
 
-      // Hitung kemudi (steering) menuju target
+      // 1. Vektor menuju target individu/gerombolan
       const desiredVelocity = new THREE.Vector3()
         .subVectors(fish.target, fish.mesh.position)
         .normalize()
         .multiplyScalar(fish.speed);
 
+      // 2. Gaya Separasi (mencegah antar ikan saling bertumpuk terlalu rapat)
+      const separation = new THREE.Vector3();
+      let neighborCount = 0;
+
+      fishes.forEach((otherFish, otherIdx) => {
+        if (index === otherIdx || !otherFish.mesh) return;
+        const dist = fish.mesh.position.distanceTo(otherFish.mesh.position);
+        if (dist > 0 && dist < 7) {
+          const pushAway = new THREE.Vector3()
+            .subVectors(fish.mesh.position, otherFish.mesh.position)
+            .normalize()
+            .divideScalar(dist); // Makin dekat makin kuat terdorong pisah
+          separation.add(pushAway);
+          neighborCount++;
+        }
+      });
+
+      if (neighborCount > 0) {
+        separation.multiplyScalar(15.0);
+        desiredVelocity.add(separation);
+      }
+
       // Interpolasi kecepatan halus (slerp/lerp kemudi)
-      fish.velocity.lerp(desiredVelocity, 1.2 * dt);
+      fish.velocity.lerp(desiredVelocity, 1.4 * dt);
 
       // Batasi kecepatan maksimum
       fish.velocity.clampLength(0.5, fish.speed);
@@ -786,7 +833,7 @@ document.addEventListener("DOMContentLoaded", () => {
       dummy.rotateY(-Math.PI / 2);
 
       // Lerp rotasi (Slerp) agar ikan berbelok secara anggun
-      fish.mesh.quaternion.slerp(dummy.quaternion, 2.5 * dt);
+      fish.mesh.quaternion.slerp(dummy.quaternion, 2.8 * dt);
     });
   }
 
@@ -903,8 +950,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 6. REAL-TIME WEBSOCKET & LOAD DATA AWAL
   function connectWebSocket() {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}`;
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${wsProtocol}//${window.location.host}`;
 
     let ws = new WebSocket(wsUrl);
 
