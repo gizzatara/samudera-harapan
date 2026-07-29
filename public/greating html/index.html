@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Samudera Harapan — Standalone Reactive Background Visual</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="description" content="Visual latar belakang laut 3D interaktif yang reaktif terhadap kehadiran pengunjung menggunakan MediaPipe.">
+  
+  <!-- Load Three.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  
+  <!-- Load MediaPipe Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+</head>
+<body style="background-color: #030d16;">
+
+  <!-- Video Element Tersembunyi untuk Pemrosesan MediaPipe Webcam -->
+  <video id="webcam-video" style="display:none;" playsinline muted></video>
+
+  <!-- Video Element Reaktif (0729.mov) -->
+  <video id="reactive-video" src="video/0729.mov" playsinline style="display:none;"></video>
+
+  <!-- Container Utama WebGL (Three.js 3D Ocean Background) -->
+  <div id="canvas-container"></div>
+
+  <!-- Status Badge Sensor MediaPipe -->
+  <div id="sensor-status" class="status-pill">
+    <span class="status-dot"></span>
+    <span id="status-text">Memulai Sensor Kamera MediaPipe...</span>
+  </div>
+
+  <!-- Floating Toolbar Controls -->
+  <div class="display-controls">
+    <button id="btn-toggle-camera" class="ui-btn active-btn">📷 Sensor: On</button>
+    <button id="btn-fullscreen" class="ui-btn">🖥️ Layar Penuh</button>
+  </div>
+
+  <!-- Canvas Debug Webcam (Opsional) -->
+  <canvas id="debug-webcam-canvas"></canvas>
+
+  <script src="background.js"></script>
+
+  <div class="credit-footer">
+    dibuat oleh <a href="https://www.instagram.com/gizzatara/" target="_blank" rel="noopener">Gizzatara</a> | background music oleh 'Afif Ircas | background visual oleh Sapta Rahita
+  </div>
+</body>
+</html>

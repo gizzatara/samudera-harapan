@@ -1,0 +1,157 @@
+/* Clean Fullscreen Layout for Standalone Reactive Background Visual */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #030d16;
+  font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+  user-select: none;
+}
+
+#canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+
+/* Status Pill (MediaPipe Sensor Badge) */
+.status-pill {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 50;
+  background: rgba(13, 44, 64, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  border-radius: 20px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #c8e6f7;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #eab308; /* Yellow = init, Green = active, Red = off */
+  box-shadow: 0 0 10px #eab308;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.status-pill.active .status-dot {
+  background-color: #22c55e;
+  box-shadow: 0 0 12px #22c55e;
+}
+
+.status-pill.reactive .status-dot {
+  background-color: #00f2fe;
+  box-shadow: 0 0 16px #00f2fe;
+  animation: pulseDot 1.2s infinite alternate;
+}
+
+.status-pill.disabled .status-dot {
+  background-color: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.3); opacity: 1; }
+}
+
+/* Floating Controls Toolbar */
+.display-controls {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+  z-index: 50;
+}
+
+.ui-btn {
+  background: rgba(13, 44, 64, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.ui-btn:hover {
+  background: rgba(13, 44, 64, 0.85);
+  border-color: #00f2fe;
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 16px rgba(0, 242, 254, 0.25);
+}
+
+.ui-btn.active-btn {
+  border-color: #00f2fe;
+  background: rgba(8, 145, 178, 0.5);
+}
+
+/* Credit Footer */
+.credit-footer {
+  position: fixed;
+  bottom: 6px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  pointer-events: none;
+  z-index: 30;
+  line-height: 1.5;
+  padding: 4px 8px;
+}
+
+.credit-footer a {
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: none;
+  pointer-events: auto;
+  transition: color 0.2s;
+}
+
+.credit-footer a:hover {
+  color: rgba(130, 220, 255, 0.9);
+}
+
+/* Small Webcam Debug Canvas (Hidden by default, optional toggle) */
+#debug-webcam-canvas {
+  position: fixed;
+  bottom: 30px;
+  right: 20px;
+  width: 140px;
+  height: 105px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 242, 254, 0.4);
+  z-index: 60;
+  background: #000;
+  display: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}

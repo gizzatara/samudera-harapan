@@ -1,0 +1,93 @@
+====================================================================
+           CHECKLIST ONSITE PAMERAN INTERAKTIF "SAMUDRA HARAPAN"
+                       PAMERAN PANCER PACITAN
+====================================================================
+
+[1] HARDWARE & PERANGKAT PERANTI UTAMA
+--------------------------------------------------------------------
+[ ] Laptop Main Display / Server
+    - Spesifikasi cukup untuk rendering 3D/Canvas visual.
+    - Charger laptop bawaan & charger cadangan.
+    - Pengaturan OS: Disable Sleep / Never Screen Saver.
+[ ] Layar Proyeksi / Smart TV / Monitor Besar
+    - Proyektor HD/4K + Screen Layar ATAU Smart TV LED besar.
+    - Remote TV/Proyektor + Baterai cadangan.
+[ ] Kabel & Adaptor Converter
+    - Kabel HDMI panjang (minimal 5-10 meter) / DisplayPort.
+    - Converter (USB-C to HDMI / VGA to HDMI sesuai port laptop).
+    - Cable organizer / Lakban kain (Gaffer Tape) pelindung lantai.
+[ ] Tablet / HP Sample Operator (1-2 unit)
+    - Untuk demonstrasi ke pengunjung atau pengujian koneksi.
+
+
+[2] JARINGAN & KONEKTIVITAS INTERNET
+--------------------------------------------------------------------
+[ ] Wi-Fi / Router / Hotspot Internet Stabil
+    - Akses internet stabil untuk memuat halaman Render & WebSocket.
+    - Kartu SIM Kuota Data Utama + Kartu SIM Provider Cadangan.
+[ ] URL & QR Code Pengunjung
+    - URL HP Pengunjung: https://samudera-harapan.onrender.com
+    - URL Display Utama (Proyektor/TV): https://samudera-harapan.onrender.com/display.html
+    - URL Panel Admin: https://samudera-harapan.onrender.com/admin.html
+
+
+[3] MATERI CETAK & MEDIA VISUAL (SIGNAGE)
+--------------------------------------------------------------------
+[ ] Cetak QR Code Berukuran Besar
+    - QR Code mengarah ke: https://samudera-harapan.onrender.com
+    - Dicetak pada stiker / papan acrylic di meja menggambar/stan.
+[ ] X-Banner / Roll Up Banner Petunjuk Interaksi
+    - Judul: Samudra Harapan
+    - 3 Langkah Mudah:
+      1. Scan QR Code via Kamera HP.
+      2. Gambar / Buat Karya & Tulis Doa di Layar HP.
+      3. Tekan "Kirim" & Lihat karya Anda berenang di Layar Besar!
+[ ] Header Booth / Standing Signage Nama Pameran.
+
+
+[4] INFRASTRUKTUR BOOTH & KELISTRIKAN
+--------------------------------------------------------------------
+[ ] Stop Kontak / Terminal Listrik (Extension Cord)
+    - Minimal 1-2 Roll Stop Kontak (4-6 colokan).
+[ ] Meja & Kursi Booth
+    - Meja laptop operator/display.
+    - Meja interaktif pengunjung (area menggambar/charger).
+[ ] Gaffer Tape / Lakban Hitam
+    - Pengaman jalur kabel listrik & HDMI di lantai.
+[ ] Penerangan / Lighting Booth (jika area pameran redup).
+
+
+[5] PERSIAPAN SOFTWARE & OPERASIONAL DIGITAL
+--------------------------------------------------------------------
+[ ] METODE UTAMA (ONLINE VIA RENDER):
+    1. Buka browser di Laptop Display (disarankan Google Chrome).
+    2. Akses: https://samudera-harapan.onrender.com/display.html
+    3. Tekan tombol "Layar Penuh" / F11 pada keyboard.
+    4. Tekan tombol "H" untuk menyembunyikan toolbar menu di layar.
+    5. Buka Panel Admin di tab terpisah: https://samudera-harapan.onrender.com/admin.html
+
+[ ] METODE CADANGAN / OFFLINE (LOKAL SERVER NODE.JS / LAN):
+    1. Buka terminal di folder projek, jalankan: node server.js
+    2. Akses Display Lokal: http://localhost:3000/display.html (Tekan F11)
+    3. Jika menggunakan Localtunnel untuk pengunjung:
+       npx localtunnel --port 3000 --subdomain gizzatara
+       URL Pengunjung: https://gizzatara.loca.lt
+
+
+[6] KELENGKAPAN TIM & OPERASIONAL (CREW)
+--------------------------------------------------------------------
+[ ] Briefing Operator / Crew Stand
+    - Penanganan panduan pengunjung saat scan QR Code.
+    - Penanganan jika koneksi internet terputus (switch ke hotspot/server lokal).
+[ ] Lembar Troubleshooting / Quick Sheet di meja operator.
+[ ] Cairan Pembersih & Tisu Layar.
+
+
+--------------------------------------------------------------------
+TIPS DARURAT ONSITE (PLAN B):
+--------------------------------------------------------------------
+1. Jika Internet Troubled (Render lambat/RTO): 
+   Langsung switch ke Server Lokal (`node server.js`) via Wi-Fi Router Lokal / Localtunnel.
+2. Jika server Render "Sleep" (Free Tier Idle): 
+   Buka URL di HP 1-2 menit sebelum pameran dimulai untuk me-whip/memulai ulang instance Render.
+====================================================================

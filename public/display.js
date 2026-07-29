@@ -23,7 +23,51 @@ document.addEventListener("DOMContentLoaded", () => {
     zMin: -50, zMax: 10
   };
 
-  // SOUND SYNTHESIZER (Web Audio API)
+  // ─── AUDIO SYSTEM ───
+  // Audio backsound (Water backsound.mp3.mpeg)
+  const bgAudio = new Audio('/audio/Water%20backsound.mp3.mpeg');
+  bgAudio.loop = true;
+  bgAudio.volume = 0.5;
+  let isAudioMuted = false;
+
+  // Audio pop-up ikan (popup .mpeg)
+  const popupAudio = new Audio('/audio/popup%20.mpeg');
+  popupAudio.volume = 0.85;
+
+  let audioUnlocked = false;
+
+  function unlockAudio() {
+    if (audioUnlocked) return;
+    audioUnlocked = true;
+
+    // Coba putar musik latar saat ada interaksi pertama dari pengguna
+    if (!isAudioMuted && bgAudio.paused) {
+      bgAudio.play().catch(err => console.log("Autoplay waiting for user interaction:", err));
+    }
+  }
+
+  // Interaksi pertama akan otomatis mengaktifkan audio yang terhalang kebijakan autoplay browser
+  window.addEventListener('click', unlockAudio, { once: false });
+  window.addEventListener('touchstart', unlockAudio, { once: false });
+  window.addEventListener('keydown', unlockAudio, { once: false });
+
+  function playPopupSound() {
+    unlockAudio();
+    try {
+      popupAudio.currentTime = 0;
+      const playPromise = popupAudio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          console.warn("Pop-up audio blocked or failed, fallback to synth splash:", err);
+          playSplashSound();
+        });
+      }
+    } catch (e) {
+      playSplashSound();
+    }
+  }
+
+  // SOUND SYNTHESIZER (Web Audio API Fallback)
   function playSplashSound() {
     try {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -955,8 +999,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Menampilkan Efek Pengumuman "Ikan Baru Masuk!" di Layar
   function triggerNewFishAnnouncement(fishData) {
-    // Putar suara splash
-    playSplashSound();
+    // Putar suara pop-up ikan
+    playPopupSound();
 
     // Isi data pengumuman
     announcementName.textContent = fishData.name;
@@ -1067,7 +1111,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 8. TETHER FLOATING BUTTON EVENT HANDLERS
   const btnToggleBubbles = document.getElementById("btn-toggle-bubbles");
+  const btnToggleAudio = document.getElementById("btn-toggle-audio");
   const btnFullscreen = document.getElementById("btn-fullscreen");
+
+  if (btnToggleAudio) {
+    btnToggleAudio.addEventListener("click", (e) => {
+      e.stopPropagation();
+      unlockAudio();
+      isAudioMuted = !isAudioMuted;
+      if (isAudioMuted) {
+        bgAudio.pause();
+        btnToggleAudio.textContent = "🔇 Musik: Off";
+      } else {
+        bgAudio.play().then(() => {
+          btnToggleAudio.textContent = "🔊 Musik: On";
+        }).catch(err => {
+          console.error("Gagal memutar musik backsound:", err);
+        });
+      }
+    });
+  }
 
   if (btnToggleBubbles) {
     btnToggleBubbles.addEventListener("click", () => {
@@ -1144,7 +1207,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Jika semua tombol menu disembunyikan, sembunyikan container menunya juga
     if (displayControls) {
-      const anyVisible = !settings.hideDrawBtn || !settings.hideToggleBubblesBtn || !settings.hideFullscreenBtn;
+      const anyVisible = !settings.hideDrawBtn || !settings.hideToggleBubblesBtn || !settings.hideFullscreenBtn || true;
       displayControls.style.opacity = anyVisible ? "" : "0";
       displayControls.style.pointerEvents = anyVisible ? "" : "none";
     }
@@ -1167,4 +1230,9 @@ document.addEventListener("DOMContentLoaded", () => {
   loadExistingFishes();
   connectWebSocket();
   animate();
+
+  // Coba putar backsound otomatis
+  bgAudio.play().catch(err => {
+    console.log("Autoplay musik terhalang browser, akan aktif saat klik pertama atau tombol Musik:", err);
+  });
 });

@@ -1,0 +1,66 @@
+====================================================================
+               PETUNJUK INTERAKSI PENGUNJUNG PAMERAN
+                       "SAMUDERA HARAPAN"
+====================================================================
+
+[Opsi A] FORMAT TEKS UNTUK X-BANNER / ROLL-UP BANNER (Ukuran 60x160 cm)
+--------------------------------------------------------------------
+(Judul Utama)
+  SAMUDERA HARAPAN
+  Akuarium Interaktif 3D
+
+(Sub-judul / Tagline)
+  "Gambar Ikanmu, Tulis Doamu, Lepas ke Laut Lepas"
+
+(Langkah-Langkah Interaksi)
+  1. SCAN QR CODE
+     Gunakan kamera HP Anda untuk memindai QR Code di bawah ini.
+
+  2. GAMBAR IKANMU & WARNAI
+     • Lukis bentuk ikan favoritmu pada kanvas HP.
+     • Gunakan Kuas (✏️) atau Ember Cat (🪣) agar warna ikanmu solid dan cantik.
+     • Pastikan kepala ikan menghadap ke kanan agar bisa berenang dengan sempurna.
+
+  3. TULIS NAMA & HARAPANMU
+     Isi nama panggilan dan tuliskan doa/harapanmu untuk kelestarian laut & alam.
+
+  4. TEKAN "LEPAS KAN IKANMU!" 🐠
+     Lihat layar proyektor! Ikan hasil karya dan doamu akan langsung berenang bebas di akuarium 3D Samudera Harapan secara real-time.
+
+(Tips Interaktif Tambahan di Banner)
+  💡 TIP: Klik atau sentuh ikanmu yang sedang berenang di layar proyektor untuk menampilkan kembali balon doamu!
+
+
+====================================================================
+
+[Opsi B] TEKS STIKER / KARTU MEJA PENGUNJUNG (Ukuran A5 / Acrylic Table Card)
+--------------------------------------------------------------------
+  🎏 BAGAIMANA CARA BERGABUNG?
+
+  [ TEMPATKAN QR CODE DI SINI ]
+  https://samudera-harapan.onrender.com
+
+  1. Scan QR Code di atas menggunakan Kamera HP.
+  2. Gambar ikanmu pada layar kanvas HP.
+  3. Tulis nama & doa/harapan untuk alam.
+  4. Tekan tombol "🐠 Lepaskan Ikanmu!".
+  5. Perhatikan layar besar di depanmu! Ikan buatanmu telah berenang di laut lepas.
+
+
+====================================================================
+
+[Opsi C] PANDUAN QUICK CHEAT SHEET UNTUK OPERATOR / CREW STAND
+--------------------------------------------------------------------
+Tugas Operator:
+1. Menyapa dan mengajak pengunjung untuk scan QR Code di meja.
+2. Membantu pengunjung jika membutuhkan panduan menggambar:
+   - Sarankan memakai fitur Ember Cat (🪣) agar gambar ikan tebal dan jelas saat di-ekstrusi jadi 3D.
+   - Mengingatkan arah kepala ikan menghadap ke kanan.
+3. Troubleshooting Ringkas di Lapangan:
+   - Pengunjung bilang "Ikan saya belum muncul di layar":
+     -> Pastikan HP pengunjung terkoneksi internet & tombol "Lepaskan Ikanmu!" sudah ditekan sampai muncul notifikasi hijau "Ikan Harapanmu berhasil dilepas ke laut!".
+   - Layar proyektor tidak merespon / freeze:
+     -> Tekan tombol 'Refresh' (F5) pada browser laptop display, lalu tekan 'F11' untuk fullscreen kembali.
+   - Ada konten yang kurang sopan / spam:
+     -> Buka tab Admin di laptop (https://samudera-harapan.onrender.com/admin.html), cari nama pengunjung tersebut lalu klik "Hapus Permanen".
+====================================================================

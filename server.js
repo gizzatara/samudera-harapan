@@ -4,6 +4,7 @@ const WebSocket = require('ws');
 const fs = require('fs');
 const path = require('path');
 const { MongoClient } = require('mongodb');
+const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
@@ -13,8 +14,19 @@ const PORT = process.env.PORT || 3000;
 const DB_FILE = path.join(__dirname, 'db.json');
 const SETTINGS_FILE = path.join(__dirname, 'settings.json');
 
+app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/audio', express.static(path.join(__dirname, 'audio')));
+app.use('/background-visual', express.static(path.join(__dirname, 'background-visual')));
+app.use('/greating', express.static(path.join(__dirname, 'public', 'greating html')));
+
+app.get('/greating', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'greating html', 'index.html'));
+});
+app.get('/greating-html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'greating html', 'index.html'));
+});
 
 // Explicitly serve index.html for root path to prevent "Not Found" on Render
 app.get('/', (req, res) => {
