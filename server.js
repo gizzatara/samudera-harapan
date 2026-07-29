@@ -28,8 +28,14 @@ app.get('/greating-html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'greating html', 'index.html'));
 });
 
-// Explicitly serve index.html for root path to prevent "Not Found" on Render
+// Explicitly serve index.html for root and display paths to prevent "Not Found" on Render
 app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+app.get('/display.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+app.get('/display', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
