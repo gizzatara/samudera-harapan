@@ -68,10 +68,7 @@
 
 [ ] METODE CADANGAN / OFFLINE (LOKAL SERVER NODE.JS / LAN):
     1. Buka terminal di folder projek, jalankan: node server.js
-    2. Akses Display Lokal: http://localhost:3000/display.html (Tekan F11)
-    3. Jika menggunakan Localtunnel untuk pengunjung:
-       npx localtunnel --port 3000 --subdomain gizzatara
-       URL Pengunjung: https://gizzatara.loca.lt
+    2. Akses Display Lokal: http://localhost:3000 (Tekan F11)
 
 
 [6] KELENGKAPAN TIM & OPERASIONAL (CREW)
@@ -87,7 +84,8 @@
 TIPS DARURAT ONSITE (PLAN B):
 --------------------------------------------------------------------
 1. Jika Internet Troubled (Render lambat/RTO): 
-   Langsung switch ke Server Lokal (`node server.js`) via Wi-Fi Router Lokal / Localtunnel.
+   Langsung switch ke Server Lokal (`node server.js`) via Wi-Fi Router Lokal.
 2. Jika server Render "Sleep" (Free Tier Idle): 
    Buka URL di HP 1-2 menit sebelum pameran dimulai untuk me-whip/memulai ulang instance Render.
-====================================================================
+====================================================
+================
